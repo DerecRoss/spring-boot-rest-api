@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/math") //localhost:8080/math/** -> for all endpoints
 public class MathController {
@@ -14,6 +16,37 @@ public class MathController {
         if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
         return converToDouble(numberOne) + converToDouble(numberTwo);
     }
+
+    @GetMapping("/sub/{numberOne}/{numberTwo}")
+    public Double sub(@PathVariable String numberOne, @PathVariable String numberTwo){
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
+        return converToDouble(numberOne) - converToDouble(numberTwo);
+    }
+
+    @GetMapping("/multiplication/{numberOne}/{numberTwo}")
+    public Double multiplication(@PathVariable String numberOne, @PathVariable String numberTwo){
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
+        return converToDouble(numberOne) * converToDouble(numberTwo);
+    }
+
+    @GetMapping("/division/{numberOne}/{numberTwo}")
+    public Double division(@PathVariable String numberOne, @PathVariable String numberTwo){
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
+        return converToDouble(numberOne) / converToDouble(numberTwo);
+    }
+
+    @GetMapping("/average/{numberOne}/{numberTwo}")
+    public Double average(@PathVariable String numberOne, @PathVariable String numberTwo){
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
+        return (converToDouble(numberOne) + converToDouble(numberTwo)) / 2;
+    }
+
+    @GetMapping("/sqrt/{numberOne}/{numberTwo}")
+    public List<Double> sqrt(@PathVariable String numberOne, @PathVariable String numberTwo){
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
+        return List.of(Math.sqrt(Double.parseDouble(numberOne)), Math.sqrt(Double.parseDouble(numberOne)));
+    }
+
 
     private Double converToDouble(String number) {
         if (number == null || number.isEmpty()) return 0d;
