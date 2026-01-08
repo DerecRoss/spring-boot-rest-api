@@ -11,7 +11,7 @@ public class MathController {
 
     @GetMapping("/sum/{numberOne}/{numberTwo}")
     public Double sum(@PathVariable String numberOne, @PathVariable String numberTwo) throws Exception{
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw  new IllegalArgumentException();
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) throw new UnsupportedOperationException("This value is not accept");
         return converToDouble(numberOne) + converToDouble(numberTwo);
     }
 

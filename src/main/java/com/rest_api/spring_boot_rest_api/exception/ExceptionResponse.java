@@ -1,5 +1,5 @@
 package com.rest_api.spring_boot_rest_api.exception;
 
-public record ExceptionResponse() {
+import java.util.Date;
 
-}
+public record ExceptionResponse(Date timeStamp, String message, String details) {}
