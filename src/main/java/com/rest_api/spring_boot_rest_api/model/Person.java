@@ -1,17 +1,31 @@
 package com.rest_api.spring_boot_rest_api.model;
 
+import jakarta.persistence.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Entity
+@Table( name = "person")
 public class Person implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+
+    @Column(name = "first_name", nullable = false, length = 20)
     public String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 30)
     public String lastName;
+
+    @Column(name = "adress", nullable = false, length = 40)
     public String adress;
+
+    @Column(name = "gender", nullable = false, length = 6)
     public String gender;
 
     public Person() {}

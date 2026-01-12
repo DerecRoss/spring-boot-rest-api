@@ -1,1 +1,22 @@
-spring.application.name=spring-boot-rest-api
+spring:
+  application:
+    name: spring-boot-rest-api
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/springdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: spring
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+server:
+  port: 8080
