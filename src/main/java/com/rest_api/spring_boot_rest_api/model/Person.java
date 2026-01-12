@@ -1,6 +1,8 @@
 package com.rest_api.spring_boot_rest_api.model;
 
+import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serial;
 import java.io.Serializable;

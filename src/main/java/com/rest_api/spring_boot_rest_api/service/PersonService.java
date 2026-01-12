@@ -1,10 +1,12 @@
 package com.rest_api.spring_boot_rest_api.service;
 
 import com.rest_api.spring_boot_rest_api.model.Person;
+import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
+import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
@@ -13,41 +15,37 @@ import java.util.logging.Logger;
 public class PersonService {
     private final AtomicLong counter = new AtomicLong();
 
-    private Logger logger = Logger.getLogger(PersonService.class.getName());
+    @Autowired
+    PersonRepository repository;
+
+    private final Logger logger = Logger.getLogger(PersonService.class.getName());
 
     public Person save(Person person){
-        logger.info("creating person.");
-        return person;
+        return repository.save(person);
     }
 
-    public Person put(Person person){
-        logger.info("updating person.");
-        return person;
+    public Person update(Person person) throws BadRequestException {
+        Person entity = repository.findById(person.getId())
+                .orElseThrow(() -> new BadRequestException("User not found."));
+        entity.setFirstName(person.getFirstName());
+        entity.setLastName(person.getLastName());
+        entity.setAdress(person.getAdress());
+        entity.setGender(person.getGender());
+
+        return repository.save(entity);
     }
 
-    public Void put(Long id){
-        logger.info("deleting person.");
-        return null;
+    public void delete(Long id) throws BadRequestException {
+        repository.delete(findById(id));
     }
 
-    public Person findById(Long id){
-        logger.info("Finding by Person.");
-        Person person = new Person();
-        person.setId(counter.incrementAndGet());
-        person.setFirstName("Bart");
-        person.setLastName("Simpson");
-        person.setAdress("SP");
-        person.setGender("M");
-        return person;
+    public Person findById(Long id) throws BadRequestException {
+        return repository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found."));
     }
 
     public List<Person> findAll(){
-        ArrayList<Person> persons = new ArrayList<Person>();
-        for (int i = 0; i < 8; i++) {
-            Person person  = mockPerson(i);
-            persons.add(person);
-        }
-        return persons;
+        return repository.findAll();
     }
 
     private Person mockPerson(int i) {
