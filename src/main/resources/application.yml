@@ -17,6 +17,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
-
+logging:
+  level:
+#    root: WARN
+    com.rest_api: DEBUG
 server:
   port: 8080
