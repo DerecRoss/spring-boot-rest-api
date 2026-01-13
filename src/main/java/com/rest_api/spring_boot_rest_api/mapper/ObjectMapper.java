@@ -11,11 +11,11 @@ public class ObjectMapper {
     private static final Mapper mapper = DozerBeanMapperBuilder.buildDefault();
 
 //    O -> origin object || D -> destination object || Data conversion of two values. ( Dto <-> Entity )
-    public static <O, D> D ParseObject(O originObject, Class<D> destinationObject){
+    public static <O, D> D parseObject(O originObject, Class<D> destinationObject){
         return mapper.map(originObject, destinationObject);
     }
 
-    public static <O, D> List<D> ParseListObjects(List<O> originObject, Class<D> destinationObject){
+    public static <O, D> List<D> parseListObjects(List<O> originObject, Class<D> destinationObject){
 
         List<D> destinationObjects = new ArrayList<D>();
         for (Object o : originObject){
