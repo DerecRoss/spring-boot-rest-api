@@ -8,15 +8,15 @@ public class PersonDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public Long id;
+    private Long id;
 
-    public String firstName;
+    private String firstName;
 
-    public String lastName;
+    private String lastName;
 
-    public String adress;
+    private String adress;
 
-    public String gender;
+    private String gender;
 
     public PersonDto() {}
 
