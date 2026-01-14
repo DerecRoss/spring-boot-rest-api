@@ -1,6 +1,7 @@
 package com.rest_api.spring_boot_rest_api.controller;
 
-import com.rest_api.spring_boot_rest_api.dto.PersonDto;
+import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
+import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
 import com.rest_api.spring_boot_rest_api.service.PersonService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,12 @@ public class PersonController {
     @PostMapping
     public ResponseEntity<PersonDto> save(@RequestBody PersonDto person){
         PersonDto entity = personService.save(person);
+        return new ResponseEntity<>(entity, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/v2")
+    public ResponseEntity<PersonDtoV2> saveV2(@RequestBody PersonDtoV2 person){
+        PersonDtoV2 entity = personService.saveV2(person);
         return new ResponseEntity<>(entity, HttpStatus.CREATED);
     }
 

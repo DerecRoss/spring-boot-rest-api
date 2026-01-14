@@ -1,6 +1,8 @@
 package com.rest_api.spring_boot_rest_api.service;
 
-import com.rest_api.spring_boot_rest_api.dto.PersonDto;
+import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
+import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
+import com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper;
 import com.rest_api.spring_boot_rest_api.model.Person;
 import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import org.apache.coyote.BadRequestException;
@@ -12,12 +14,17 @@ import java.util.logging.Logger;
 
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseListObjects;
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseObject;
+import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertDtoV2ToEntity;
+import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertEntityToDtoV2;
 
 @Service
 public class PersonService {
 
     @Autowired
     PersonRepository repository;
+
+    @Autowired
+    PersonMapper personMapper;
 
     private final Logger logger = Logger.getLogger(PersonService.class.getName());
 
@@ -26,6 +33,13 @@ public class PersonService {
 
         logger.info("Saving Person in database.");
         return parseObject(repository.save(entity), PersonDto.class);
+    }
+
+    public PersonDtoV2 saveV2(PersonDtoV2 personDtoV2){
+        var entity = convertDtoV2ToEntity(personDtoV2);
+
+        logger.info("Saving Person in database. - V2");
+        return convertEntityToDtoV2(repository.save(entity));
     }
 
     public PersonDto update(PersonDto PersonDto) throws BadRequestException {

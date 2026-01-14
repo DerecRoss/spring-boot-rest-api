@@ -1,4 +1,4 @@
-package com.rest_api.spring_boot_rest_api.dto;
+package com.rest_api.spring_boot_rest_api.dto.v1;
 
 import java.io.Serial;
 import java.io.Serializable;
