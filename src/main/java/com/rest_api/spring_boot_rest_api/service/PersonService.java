@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseListObjects;
@@ -16,7 +15,6 @@ import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseObject;
 
 @Service
 public class PersonService {
-    private final AtomicLong counter = new AtomicLong();
 
     @Autowired
     PersonRepository repository;
@@ -25,6 +23,8 @@ public class PersonService {
 
     public PersonDto save(PersonDto personDto){
         var entity = parseObject(personDto, Person.class);
+
+        logger.info("Saving Person in database.");
         return parseObject(repository.save(entity), PersonDto.class);
     }
 
@@ -36,12 +36,15 @@ public class PersonService {
         entity.setAdress(PersonDto.getAdress());
         entity.setGender(PersonDto.getGender());
 
+        logger.info("Update Person in database.");
         return parseObject(repository.save(entity), PersonDto.class);
     }
 
     public void delete(Long id) throws BadRequestException {
         Person entity = repository.findById(id)
                         .orElseThrow(() -> new BadRequestException("User not found"));
+
+        logger.info("Delete Person in database.");
         repository.delete(entity);
     }
 
@@ -49,21 +52,12 @@ public class PersonService {
         var entity = repository.findById(id)
                 .orElseThrow(() -> new BadRequestException("User not found."));
 
+        logger.info("Finding Person in database.");
         return parseObject(entity, PersonDto.class);
     }
 
     public List<PersonDto> findAll(){
+        logger.info("Finding All Person in database.");
         return parseListObjects(repository.findAll(), PersonDto.class);
-    }
-
-    private PersonDto mockPersonDto(int i) {
-        logger.info("Finding by PersonDto.");
-        PersonDto PersonDto = new PersonDto();
-        PersonDto.setId(counter.incrementAndGet());
-        PersonDto.setFirstName("First Name " + i);
-        PersonDto.setLastName("Last Name " + i);
-        PersonDto.setAdress("SP" + i);
-        PersonDto.setGender("M" + i);
-        return PersonDto;
     }
 }
