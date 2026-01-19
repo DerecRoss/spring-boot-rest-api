@@ -1,10 +1,12 @@
 package com.rest_api.spring_boot_rest_api.dto.v1;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class PersonDto implements Serializable {
+public class PersonDto extends RepresentationModel<PersonDto> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 

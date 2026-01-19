@@ -1,5 +1,6 @@
 package com.rest_api.spring_boot_rest_api.service;
 
+import com.rest_api.spring_boot_rest_api.controller.PersonController;
 import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
 import com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper;
@@ -16,6 +17,8 @@ import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseListObj
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseObject;
 import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertDtoV2ToEntity;
 import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertEntityToDtoV2;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class PersonService {
@@ -32,7 +35,13 @@ public class PersonService {
         var entity = parseObject(personDto, Person.class);
 
         logger.info("Saving Person in database.");
-        return parseObject(repository.save(entity), PersonDto.class);
+        var dto = parseObject(repository.save(entity), PersonDto.class);
+        try {
+            addHateOsLinks(dto);
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+        return dto;
     }
 
     public PersonDtoV2 saveV2(PersonDtoV2 personDtoV2){
@@ -51,7 +60,9 @@ public class PersonService {
         entity.setGender(PersonDto.getGender());
 
         logger.info("Update Person in database.");
-        return parseObject(repository.save(entity), PersonDto.class);
+        var dto = parseObject(repository.save(entity), PersonDto.class);
+        addHateOsLinks(dto);
+        return dto;
     }
 
     public void delete(Long id) throws BadRequestException {
@@ -67,11 +78,33 @@ public class PersonService {
                 .orElseThrow(() -> new BadRequestException("User not found."));
 
         logger.info("Finding Person in database.");
-        return parseObject(entity, PersonDto.class);
+        var dto = parseObject(entity, PersonDto.class);
+        addHateOsLinks(dto); // manual method
+        return dto;
     }
 
     public List<PersonDto> findAll(){
         logger.info("Finding All Person in database.");
-        return parseListObjects(repository.findAll(), PersonDto.class);
+        var persons = parseListObjects(repository.findAll(), PersonDto.class);
+        persons.forEach(p -> {
+            try {
+                addHateOsLinks(p);
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return persons;
+    }
+
+    private void addHateOsLinks(PersonDto dto) throws BadRequestException {
+        dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
+
+        dto.add(linkTo(methodOn(PersonController.class).findAll()).withRel("find-all").withType("GET"));
+
+        dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
+
+        dto.add(linkTo(methodOn(PersonController.class).save(dto)).withRel("create").withType("POST"));
+
+        dto.add(linkTo(methodOn(PersonController.class).put(dto)).withRel("update").withType("PUT"));
     }
 }
