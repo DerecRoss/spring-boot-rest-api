@@ -1,6 +1,7 @@
 package com.rest_api.spring_boot_rest_api.exception.handler;
 
 import com.rest_api.spring_boot_rest_api.exception.ExceptionResponse;
+import com.rest_api.spring_boot_rest_api.exception.RequiredObjectIsNonNullException;
 import com.rest_api.spring_boot_rest_api.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,13 @@ public class CustomizeEntityResponseHandler extends ResponseEntityExceptionHandl
         return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
     }
 
+
+    @ExceptionHandler(RequiredObjectIsNonNullException.class) // support for all exceptions for Exception.class
+    public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(Exception e, WebRequest webRequest){
+        ExceptionResponse response = new ExceptionResponse(new Date(), e.getMessage(),
+                webRequest.getDescription(true));
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class) // support for all exceptions for Exception.class
     public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception e, WebRequest webRequest){

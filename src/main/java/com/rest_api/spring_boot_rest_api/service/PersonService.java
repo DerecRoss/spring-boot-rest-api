@@ -3,6 +3,7 @@ package com.rest_api.spring_boot_rest_api.service;
 import com.rest_api.spring_boot_rest_api.controller.PersonController;
 import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
+import com.rest_api.spring_boot_rest_api.exception.RequiredObjectIsNonNullException;
 import com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper;
 import com.rest_api.spring_boot_rest_api.model.Person;
 import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
@@ -32,6 +33,9 @@ public class PersonService {
     private final Logger logger = Logger.getLogger(PersonService.class.getName());
 
     public PersonDto save(PersonDto personDto){
+
+        if (personDto == null) throw new RequiredObjectIsNonNullException();
+
         var entity = parseObject(personDto, Person.class);
 
         logger.info("Saving Person in database.");
@@ -51,13 +55,16 @@ public class PersonService {
         return convertEntityToDtoV2(repository.save(entity));
     }
 
-    public PersonDto update(PersonDto PersonDto) throws BadRequestException {
-        Person entity = repository.findById(PersonDto.getId())
+    public PersonDto update(PersonDto personDto) throws BadRequestException {
+
+        if (personDto == null) throw new RequiredObjectIsNonNullException();
+
+        Person entity = repository.findById(personDto.getId())
                 .orElseThrow(() -> new BadRequestException("User not found."));
-        entity.setFirstName(PersonDto.getFirstName());
-        entity.setLastName(PersonDto.getLastName());
-        entity.setAdress(PersonDto.getAdress());
-        entity.setGender(PersonDto.getGender());
+        entity.setFirstName(personDto.getFirstName());
+        entity.setLastName(personDto.getLastName());
+        entity.setAdress(personDto.getAdress());
+        entity.setGender(personDto.getGender());
 
         logger.info("Update Person in database.");
         var dto = parseObject(repository.save(entity), PersonDto.class);
