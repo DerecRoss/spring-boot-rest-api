@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,6 +57,26 @@ class BookServiceTest {
         assertEquals(bookInDb.getId(), result.getId());
         assertNotNull(result.getId());
 
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("self") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("findAll") && link.getHref().endsWith("/api/book/v1/find-all")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("save") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("POST"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("update") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("PUT"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("delete") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("DELETE"));
+
     }
 
     @Test
@@ -75,6 +96,26 @@ class BookServiceTest {
         assertNotNull(result);
         assertEquals(bookInDb.getId(), result.getId());
         assertNotNull(result.getId());
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("self") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("findAll") && link.getHref().endsWith("/api/book/v1/find-all")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("save") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("POST"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("update") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("PUT"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("delete") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("DELETE"));
     }
 
     @Test
@@ -104,6 +145,26 @@ class BookServiceTest {
         assertNotNull(result);
         assertNotNull(result.getId());
         assertNotNull(result.getLinks());
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("self") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("findAll") && link.getHref().endsWith("/api/book/v1/find-all")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("save") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("POST"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("update") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("PUT"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("delete") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("DELETE"));
     }
 
     @Test
@@ -116,5 +177,25 @@ class BookServiceTest {
         assertEquals(14, booksDto.size());
 
         var bookOne = booksDto.get(1);
+
+        bookOne.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("self") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        bookOne.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("findAll") && link.getHref().endsWith("/api/book/v1/find-all")
+                        && Objects.requireNonNull(link.getType()).equals("GET"));
+
+        bookOne.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("save") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("POST"));
+
+        bookOne.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("update") && link.getHref().endsWith("/api/book/v1")
+                        && Objects.requireNonNull(link.getType()).equals("PUT"));
+
+        bookOne.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("delete") && link.getHref().endsWith("/api/book/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("DELETE"));
     }
 }
