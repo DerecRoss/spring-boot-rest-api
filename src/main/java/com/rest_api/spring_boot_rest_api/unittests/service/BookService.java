@@ -1,4 +1,4 @@
-package com.rest_api.spring_boot_rest_api.service;
+package com.rest_api.spring_boot_rest_api.unittests.service;
 
 import com.rest_api.spring_boot_rest_api.controller.BookController;
 import com.rest_api.spring_boot_rest_api.dto.v1.BookDto;
