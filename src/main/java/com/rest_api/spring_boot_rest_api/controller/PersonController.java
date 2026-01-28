@@ -15,12 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/person/v1")
+//@CrossOrigin(origins = "http://localhost:8080")
 @Tag(name = "People", description = "Endpoints for manage peoples.")
 public class PersonController implements PersonControllerDocs {
 
     @Autowired
     public PersonService personService;
 
+//    @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping("/{id}")
     @Override
     public ResponseEntity<PersonDto> findById(@PathVariable Long id) throws BadRequestException {
@@ -34,6 +36,7 @@ public class PersonController implements PersonControllerDocs {
         return new ResponseEntity<>(personService.findAll(), HttpStatus.OK);
     }
 
+//    @CrossOrigin(origins = {"http://localhost:8080", "http://github.com/DerecRoss"})
     @PostMapping
     @Override
     public ResponseEntity<PersonDto> save(@RequestBody PersonDto person) {

@@ -1,5 +1,7 @@
 server:
   port: 8080
+cors:
+  originPatterns: http://localhost:8080,http://localhost:3000,http://github.com/DerecRoss
 spring:
   application:
     name: spring-boot-rest-api
