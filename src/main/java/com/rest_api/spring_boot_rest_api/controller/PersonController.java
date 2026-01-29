@@ -3,7 +3,7 @@ package com.rest_api.spring_boot_rest_api.controller;
 import com.rest_api.spring_boot_rest_api.controller.docs.PersonControllerDocs;
 import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
-import com.rest_api.spring_boot_rest_api.unittests.service.PersonService;
+import com.rest_api.spring_boot_rest_api.service.PersonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.rest_api.spring_boot_rest_api.controller;
 
 import com.rest_api.spring_boot_rest_api.controller.docs.BookControllerDocs;
 import com.rest_api.spring_boot_rest_api.dto.v1.BookDto;
-import com.rest_api.spring_boot_rest_api.unittests.service.BookService;
+import com.rest_api.spring_boot_rest_api.service.BookService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

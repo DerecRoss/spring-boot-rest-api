@@ -1,7 +1,5 @@
 package com.rest_api.spring_boot_rest_api.integrationtests.dto;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;

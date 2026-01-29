@@ -8,4 +8,5 @@ public interface TestConfigs {
 
     String HEADER_PARAM_GITHUB = "http://github.com/DerecRoss";
     String HEADER_PARAM_GOOGLE = "http://google.com.br";
+    String HEADER_PARAM_LOCALHOST = "http://localhost:8080";
 }

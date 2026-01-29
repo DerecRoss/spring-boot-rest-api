@@ -1,4 +1,4 @@
-package com.rest_api.spring_boot_rest_api.unittests.service;
+package com.rest_api.spring_boot_rest_api.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
