@@ -57,6 +57,12 @@ public class PersonController implements PersonControllerDocs {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    @Override
+    public ResponseEntity<PersonDto> disablePerson(@PathVariable Long id) throws BadRequestException {
+        return new ResponseEntity<>(personService.disablePerson(id), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     @Override
     public ResponseEntity<Void> delete(@PathVariable Long id) throws BadRequestException {

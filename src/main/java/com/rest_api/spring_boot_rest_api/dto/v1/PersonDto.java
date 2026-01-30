@@ -20,28 +20,32 @@ public class PersonDto extends RepresentationModel<PersonDto> implements Seriali
 
     private String gender;
 
-    public PersonDto() {}
+    private Boolean enabled;
 
-    public PersonDto(Long id, String firstName, String lastName, String adress, String gender) {
+    public PersonDto() {
+    }
+
+    public PersonDto(Long id, String firstName, String lastName, String adress, String gender, Boolean enabled) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.adress = adress;
         this.gender = gender;
+        this.enabled = enabled;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        PersonDto person = (PersonDto) o;
-        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(adress, person.adress) && Objects.equals(gender, person.gender);
+        if (!super.equals(o)) return false;
+        PersonDto personDto = (PersonDto) o;
+        return Objects.equals(id, personDto.id) && Objects.equals(firstName, personDto.firstName) && Objects.equals(lastName, personDto.lastName) && Objects.equals(adress, personDto.adress) && Objects.equals(gender, personDto.gender) && Objects.equals(enabled, personDto.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, adress, gender);
+        return Objects.hash(super.hashCode(), id, firstName, lastName, adress, gender, enabled);
     }
-
 
     public Long getId() {
         return id;
@@ -81,5 +85,13 @@ public class PersonDto extends RepresentationModel<PersonDto> implements Seriali
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

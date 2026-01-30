@@ -7,6 +7,7 @@ import com.rest_api.spring_boot_rest_api.exception.RequiredObjectIsNonNullExcept
 import com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper;
 import com.rest_api.spring_boot_rest_api.model.Person;
 import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,9 @@ public class PersonService {
         var entity = parseObject(personDto, Person.class);
 
         logger.info("Saving Person in database.");
+
+        entity.setEnabled(true);
+
         var dto = parseObject(repository.save(entity), PersonDto.class);
         try {
             addHateOsLinks(dto);
@@ -80,6 +84,20 @@ public class PersonService {
         repository.delete(entity);
     }
 
+    @Transactional // for ACID requirements, this operation is not managed by JPA.
+    public PersonDto disablePerson(Long id) throws BadRequestException {
+        repository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        logger.info("Disabling Person in database.");
+        repository.disablePerson(id);
+        var entity = repository.findById(id).get();
+
+        var dto = parseObject(entity, PersonDto.class);
+        addHateOsLinks(dto);
+        return dto;
+    }
+
     public PersonDto findById(Long id) throws BadRequestException {
         var entity = repository.findById(id)
                 .orElseThrow(() -> new BadRequestException("User not found."));
@@ -113,5 +131,7 @@ public class PersonService {
         dto.add(linkTo(methodOn(PersonController.class).save(dto)).withRel("create").withType("POST"));
 
         dto.add(linkTo(methodOn(PersonController.class).put(dto)).withRel("update").withType("PUT"));
+
+        dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
     }
 }

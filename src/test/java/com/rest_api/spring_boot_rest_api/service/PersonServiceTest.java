@@ -74,7 +74,7 @@ class PersonServiceTest {
 
         PersonDto personDto = input.mockDTO(1);
 
-        when(personRepository.save(person)).thenReturn(personInDb); // mockito actions when instance use findById(id);
+        when(personRepository.save(any(Person.class))).thenReturn(personInDb); // mockito actions when instance use findById(id);
 
         var result = personService.save(personDto); // this var is for assertions check the result of operation
 
@@ -101,6 +101,10 @@ class PersonServiceTest {
         result.getLinks().stream()
                 .anyMatch(link -> link.getRel().value().equals("delete") && link.getHref().endsWith("/api/person/v1/1")
                         && Objects.requireNonNull(link.getType()).equals("DELETE"));
+
+        result.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("patch") && link.getHref().endsWith("/api/person/v1/1")
+                        && Objects.requireNonNull(link.getType()).equals("PATCH"));
 
         assertEquals("Address Test1", result.getAdress());
         assertEquals("First Name Test1", result.getFirstName());

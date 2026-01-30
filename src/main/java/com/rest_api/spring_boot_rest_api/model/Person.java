@@ -1,8 +1,6 @@
 package com.rest_api.spring_boot_rest_api.model;
 
-import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -30,28 +28,32 @@ public class Person implements Serializable {
     @Column(name = "gender", nullable = false, length = 6)
     private String gender;
 
-    public Person() {}
+    @Column(name = "enabled")
+    private Boolean enabled;
 
-    public Person(Long id, String firstName, String lastName, String adress, String gender) {
+    public Person() {
+    }
+
+    public Person(Long id, String firstName, String lastName, String adress, String gender, Boolean enabled) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.adress = adress;
         this.gender = gender;
+        this.enabled = enabled;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(adress, person.adress) && Objects.equals(gender, person.gender);
+        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(adress, person.adress) && Objects.equals(gender, person.gender) && Objects.equals(enabled, person.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, adress, gender);
+        return Objects.hash(id, firstName, lastName, adress, gender, enabled);
     }
-
 
     public Long getId() {
         return id;
@@ -91,5 +93,13 @@ public class Person implements Serializable {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
