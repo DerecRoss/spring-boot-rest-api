@@ -1,4 +1,4 @@
-package com.rest_api.spring_boot_rest_api.integrationtests;
+package com.rest_api.spring_boot_rest_api.integrationtests.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerTest extends AbstractIntegrationTest {
+class PersonControllerWithJsonTest extends AbstractIntegrationTest {
 
     private static RequestSpecification requestSpecification;
     private static ObjectMapper objectMapper;
@@ -34,12 +34,6 @@ class PersonControllerTest extends AbstractIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // disable fail on read hateoas properties.
 
         person = new PersonDto(); // init in Junit lifecycle
-    }
-
-    @Order(1)
-    @Test
-    void save() throws JsonProcessingException {
-        mockPerson();
 
         requestSpecification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.HEADER_PARAM_GITHUB)
@@ -48,6 +42,14 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL)) // log for request
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL)) // log for response
                 .build();
+    }
+
+    @Order(1)
+    @Test
+    void save() throws JsonProcessingException {
+        mockPerson();
+
+
 
         var content = given(requestSpecification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -56,6 +58,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .post()
                 .then()
                 .statusCode(201)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .extract()
                 .body()
                 .asString();
@@ -78,56 +81,18 @@ class PersonControllerTest extends AbstractIntegrationTest {
 
     @Order(2)
     @Test
-    void saveWithWrongOrigin() throws JsonProcessingException {
+    void update() throws JsonProcessingException {
 
-        requestSpecification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.HEADER_PARAM_GOOGLE)
-                .setBasePath("/api/person/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL)) // log for request
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL)) // log for response
-                .build();
+        person.setLastName("repoleved");
 
         var content = given(requestSpecification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(person)
                 .when()
-                .post()
-                .then()
-                .statusCode(403)
-                .extract()
-                .body()
-                .asString();
-
-        assertEquals("Invalid CORS request", content);
-    }
-
-    private void mockPerson() {
-        person.setFirstName("Test Man");
-        person.setLastName("Developer");
-        person.setAdress("Linux");
-        person.setGender("Male");
-    }
-
-
-    @Order(3)
-    @Test
-    void findById() throws JsonProcessingException {
-        requestSpecification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.HEADER_PARAM_LOCALHOST)
-                .setBasePath("/api/person/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL)) // log for request
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL)) // log for response
-                .build();
-
-        var content = given(requestSpecification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", person.getId()) // parameter name in controller /{id}
-                .when()
-                .get("{id}")
+                .put()
                 .then()
                 .statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .extract()
                 .body()
                 .asString();
@@ -143,21 +108,22 @@ class PersonControllerTest extends AbstractIntegrationTest {
         assertTrue(createdPerson.getId() > 0);
 
         assertEquals("Test Man", createdPerson.getFirstName());
-        assertEquals("Developer", createdPerson.getLastName());
+        assertEquals("repoleved", createdPerson.getLastName());
         assertEquals("Linux", createdPerson.getAdress());
         assertEquals("Male", createdPerson.getGender());
     }
 
-    @Order(4)
+    private void mockPerson() {
+        person.setFirstName("Test Man");
+        person.setLastName("Developer");
+        person.setAdress("Linux");
+        person.setGender("Male");
+    }
+
+
+    @Order(3)
     @Test
-    void findByIdWithWrongOrigin() throws JsonProcessingException {
-        requestSpecification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.HEADER_PARAM_GOOGLE)
-                .setBasePath("/api/person/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL)) // log for request
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL)) // log for response
-                .build();
+    void findById() throws JsonProcessingException {
 
         var content = given(requestSpecification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -165,21 +131,70 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .when()
                 .get("{id}")
                 .then()
-                .statusCode(403)
+                .statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-        assertEquals("Invalid CORS request", content);
+        PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+        person = createdPerson;
 
+        assertNotNull(createdPerson.getId());
+        assertNotNull(createdPerson.getEnabled());
+        assertTrue(createdPerson.getId() > 0);
+
+        assertEquals("Test Man", createdPerson.getFirstName());
+        assertEquals("repoleved", createdPerson.getLastName());
+        assertEquals("Linux", createdPerson.getAdress());
+        assertEquals("Male", createdPerson.getGender());
     }
+
+    @Order(4)
+    @Test
+    void disablePerson() throws JsonProcessingException {
+
+        var content = given(requestSpecification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", person.getId()) // parameter name in controller /{id}
+                .when()
+                .patch("{id}")
+                .then()
+                .statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .extract()
+                .body()
+                .asString();
+
+        PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+        person = createdPerson;
+
+        assertNotNull(createdPerson.getId());
+        assertNotNull(createdPerson.getEnabled());
+        assertTrue(createdPerson.getId() > 0);
+
+        assertEquals("Test Man", createdPerson.getFirstName());
+        assertEquals("repoleved", createdPerson.getLastName());
+        assertEquals("Linux", createdPerson.getAdress());
+        assertEquals("Male", createdPerson.getGender());
+        assertFalse(createdPerson.getEnabled());
+    }
+
+    @Order(5)
+    @Test
+    void delete(){
+
+                given(requestSpecification)
+                .pathParam("id", person.getId()) // parameter name in controller /{id}
+                .when()
+                .delete("{id}")
+                .then()
+                .statusCode(204);
+    }
+
 
     @Test
     void put() {
-    }
-
-    @Test
-    void delete() {
     }
 
     @Test
