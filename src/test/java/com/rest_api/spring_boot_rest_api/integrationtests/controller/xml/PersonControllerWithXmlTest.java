@@ -1,9 +1,10 @@
-package com.rest_api.spring_boot_rest_api.integrationtests.controller.json;
+package com.rest_api.spring_boot_rest_api.integrationtests.controller.xml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rest_api.spring_boot_rest_api.config.TestConfigs;
 import com.rest_api.spring_boot_rest_api.integrationtests.dto.PersonDto;
 import com.rest_api.spring_boot_rest_api.integrationtests.testecontainers.AbstractIntegrationTest;
@@ -24,23 +25,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerWithJsonTest extends AbstractIntegrationTest {
+class PersonControllerWithXmlTest extends AbstractIntegrationTest {
 
     private static RequestSpecification requestSpecification;
-    private static ObjectMapper objectMapper;
+    private static XmlMapper xmlMapper;
 
     private static PersonDto person;
 
     @BeforeAll
     static void setUp(){
-        objectMapper = new ObjectMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // disable fail on read hateoas properties.
+
+        xmlMapper = new XmlMapper();
+        xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // disable fail on read hateoas properties.
 
         person = new PersonDto(); // init in Junit lifecycle
 
         requestSpecification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.HEADER_PARAM_GITHUB)
                 .setBasePath("/api/person/v1")
+                .setContentType("application/xml")
+                .setAccept("application/xml")
                 .setPort(TestConfigs.SERVER_PORT)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL)) // log for request
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL)) // log for response
@@ -54,19 +58,19 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
 
 
 
-        var content = given(requestSpecification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        var content = given().spec(requestSpecification)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .body(person)
                 .when()
                 .post()
                 .then()
                 .statusCode(201)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-            PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+            PersonDto createdPerson = xmlMapper.readValue(content, PersonDto.class);
             person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -89,18 +93,18 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
         person.setLastName("repoleved");
 
         var content = given(requestSpecification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .body(person)
                 .when()
                 .put()
                 .then()
                 .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-        PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+        PersonDto createdPerson = xmlMapper.readValue(content, PersonDto.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -129,18 +133,18 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
     void findById() throws JsonProcessingException {
 
         var content = given(requestSpecification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .pathParam("id", person.getId()) // parameter name in controller /{id}
                 .when()
                 .get("{id}")
                 .then()
                 .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-        PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+        PersonDto createdPerson = xmlMapper.readValue(content, PersonDto.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -158,18 +162,18 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
     void disablePerson() throws JsonProcessingException {
 
         var content = given(requestSpecification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .pathParam("id", person.getId()) // parameter name in controller /{id}
                 .when()
                 .patch("{id}")
                 .then()
                 .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-        PersonDto createdPerson = objectMapper.readValue(content, PersonDto.class);
+        PersonDto createdPerson = xmlMapper.readValue(content, PersonDto.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -188,18 +192,18 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
     void findAll() throws JsonProcessingException {
 
         var content = given(requestSpecification)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_XML_VALUE)
                 .basePath("/api/person/v1/find-all")
                 .when()
                 .get()
                 .then()
                 .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
                 .body()
                 .asString();
 
-        List<PersonDto> people = objectMapper.readValue(content, new TypeReference<List<PersonDto>>() {});
+        List<PersonDto> people = xmlMapper.readValue(content, new TypeReference<List<PersonDto>>() {});
 
         PersonDto personOne = people.get(0);
 

@@ -1,9 +1,15 @@
 package com.rest_api.spring_boot_rest_api.integrationtests.dto;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PersonDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
