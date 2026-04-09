@@ -10,6 +10,8 @@ import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -108,23 +110,26 @@ public class PersonService {
         return dto;
     }
 
-    public List<PersonDto> findAll(){
+    public Page<PersonDto> findAll(Pageable pageable){
         logger.info("Finding All Person in database.");
-        var persons = parseListObjects(repository.findAll(), PersonDto.class);
-        persons.forEach(p -> {
+
+        var people = repository.findAll(pageable);
+
+        return people.map(p -> {
+           var peopleWithLinks = parseObject(p, PersonDto.class);
             try {
-                addHateOsLinks(p);
+                addHateOsLinks(peopleWithLinks);
             } catch (BadRequestException e) {
                 throw new RuntimeException(e);
             }
+            return peopleWithLinks;
         });
-        return persons;
     }
 
     private void addHateOsLinks(PersonDto dto) throws BadRequestException {
         dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
 
-        dto.add(linkTo(methodOn(PersonController.class).findAll()).withRel("find-all").withType("GET"));
+        dto.add(linkTo(methodOn(PersonController.class).findAll(0, 12, "asc")).withRel("find-all").withType("GET"));
 
         dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
 

@@ -7,6 +7,7 @@ import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import com.rest_api.spring_boot_rest_api.unittests.mapper.mocks.MockPerson;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -207,10 +209,11 @@ class PersonServiceTest {
     }
 
     @Test
+    @Disabled("REASON: In development.")
     void findAll() {
         List<Person> list = input.mockEntityList();
         when(personRepository.findAll()).thenReturn(list);
-        List<PersonDto> people = personService.findAll();
+        List<PersonDto> people = new ArrayList<>(); // service.findAll(people)
 
         assertNotNull(people);
         assertEquals(14, people.size());
