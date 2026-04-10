@@ -12,12 +12,17 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.logging.Logger;
 
-import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseListObjects;
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseObject;
 import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertDtoV2ToEntity;
 import static com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper.convertEntityToDtoV2;
@@ -32,6 +37,9 @@ public class PersonService {
 
     @Autowired
     PersonMapper personMapper;
+
+    @Autowired
+    PagedResourcesAssembler<PersonDto> assembler;
 
     private final Logger logger = Logger.getLogger(PersonService.class.getName());
 
@@ -110,20 +118,30 @@ public class PersonService {
         return dto;
     }
 
-    public Page<PersonDto> findAll(Pageable pageable){
+    public PagedModel<EntityModel<PersonDto>> findAll(Pageable pageable){
         logger.info("Finding All Person in database.");
+
 
         var people = repository.findAll(pageable);
 
-        return people.map(p -> {
-           var peopleWithLinks = parseObject(p, PersonDto.class);
+        var peopleWithLinks = people.map(person -> {
+            var dto = parseObject(person, PersonDto.class);
             try {
-                addHateOsLinks(peopleWithLinks);
+                addHateOsLinks(dto);
             } catch (BadRequestException e) {
                 throw new RuntimeException(e);
             }
-            return peopleWithLinks;
+            return dto;
         });
+
+        Link findAllLink = WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(PersonController.class)
+                                .findAll(
+                                        pageable.getPageNumber(),
+                                        pageable.getPageSize(),
+                                        String.valueOf(pageable.getSort())))
+                .withSelfRel();
+        return assembler.toModel(peopleWithLinks, findAllLink);
     }
 
     private void addHateOsLinks(PersonDto dto) throws BadRequestException {
