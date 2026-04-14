@@ -7,6 +7,12 @@ import com.rest_api.spring_boot_rest_api.model.Book;
 import com.rest_api.spring_boot_rest_api.repository.BookRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +27,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class BookService {
     @Autowired
     private BookRepository repository;
+
+    @Autowired
+    PagedResourcesAssembler<BookDto> assembler;
 
     private final Logger logger = Logger.getLogger(PersonService.class.getName());
 
@@ -76,23 +85,35 @@ public class BookService {
         return dto;
     }
 
-    public List<BookDto> findAll(){
+    public PagedModel<EntityModel<BookDto>> findAll(Pageable pageable){
         logger.info("Finding All Person in database.");
-        var persons = parseListObjects(repository.findAll(), BookDto.class);
-        persons.forEach(p -> {
+
+        var books = repository.findAll(pageable);
+
+        var booksWithLinks = books.map(b -> {
+            var dto = parseObject(b, BookDto.class);
             try {
-                addHateOsLinks(p);
+                addHateOsLinks(dto);
             } catch (BadRequestException e) {
                 throw new RuntimeException(e);
             }
+            return dto;
         });
-        return persons;
+
+        Link findAllLinks = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(BookController.class)
+                .findAll(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    String.valueOf(pageable.getSort())
+        )).withSelfRel();
+
+        return assembler.toModel(booksWithLinks, findAllLinks);
     }
 
     private void addHateOsLinks(BookDto dto) throws BadRequestException {
         dto.add(linkTo(methodOn(BookController.class).findById(dto.getId())).withSelfRel().withType("GET"));
 
-        dto.add(linkTo(methodOn(BookController.class).findAll()).withRel("find-all").withType("GET"));
+        dto.add(linkTo(methodOn(BookController.class).findAll(0, 12, "asc")).withRel("find-all").withType("GET"));
 
         dto.add(linkTo(methodOn(BookController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
 

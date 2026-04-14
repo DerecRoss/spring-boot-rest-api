@@ -6,6 +6,11 @@ import com.rest_api.spring_boot_rest_api.service.BookService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +33,15 @@ public class BookController implements BookControllerDocs {
 
     @GetMapping("/find-all")
     @Override
-    public ResponseEntity<List<BookDto>> findAll() {
-        return new ResponseEntity<>(bookService.findAll(), HttpStatus.OK);
+    public ResponseEntity<PagedModel<EntityModel<BookDto>>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "0") String direction) {
+
+        var SortDirect = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
+
+        return new ResponseEntity<>(bookService.findAll(pageable), HttpStatus.OK);
     }
 
     @PostMapping
