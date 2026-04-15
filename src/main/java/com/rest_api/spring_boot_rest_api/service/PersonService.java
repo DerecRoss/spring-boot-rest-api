@@ -144,6 +144,32 @@ public class PersonService {
         return assembler.toModel(peopleWithLinks, findAllLink);
     }
 
+    public PagedModel<EntityModel<PersonDto>> findPeopleByName(String firstName, Pageable pageable){
+        logger.info("Finding person in database with contains: "+firstName);
+
+
+        var people = repository.findPeopleByName(firstName, pageable);
+
+        var peopleWithLinks = people.map(person -> {
+            var dto = parseObject(person, PersonDto.class);
+            try {
+                addHateOsLinks(dto);
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
+            return dto;
+        });
+
+        Link findAllLink = WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(PersonController.class)
+                                .findAll(
+                                        pageable.getPageNumber(),
+                                        pageable.getPageSize(),
+                                        String.valueOf(pageable.getSort())))
+                .withSelfRel();
+        return assembler.toModel(peopleWithLinks, findAllLink);
+    }
+
     private void addHateOsLinks(PersonDto dto) throws BadRequestException {
         dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
 
