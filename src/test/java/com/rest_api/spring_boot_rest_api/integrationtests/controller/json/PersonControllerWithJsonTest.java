@@ -1,12 +1,12 @@
 package com.rest_api.spring_boot_rest_api.integrationtests.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rest_api.spring_boot_rest_api.config.TestConfigs;
 import com.rest_api.spring_boot_rest_api.integrationtests.dto.PersonDto;
 import com.rest_api.spring_boot_rest_api.integrationtests.testecontainers.AbstractIntegrationTest;
+import com.rest_api.spring_boot_rest_api.wrapper.PersonWrapperDto;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -15,6 +15,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
@@ -190,6 +191,9 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
         var content = given(requestSpecification)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .basePath("/api/person/v1/find-all")
+                .queryParam("size", 12)
+                .queryParam("page", 0)
+                .queryParam("direction", "asc")
                 .when()
                 .get()
                 .then()
@@ -199,7 +203,8 @@ class PersonControllerWithJsonTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        List<PersonDto> people = objectMapper.readValue(content, new TypeReference<List<PersonDto>>() {});
+        PersonWrapperDto wrapperDto = objectMapper.readValue(content, PersonWrapperDto.class);
+        List<PersonDto> people = wrapperDto.getPersonEmbeddedDto().getPersonDto();
 
         PersonDto personOne = people.get(0);
 
