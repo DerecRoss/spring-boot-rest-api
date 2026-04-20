@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rest_api.spring_boot_rest_api.config.TestConfigs;
 import com.rest_api.spring_boot_rest_api.integrationtests.dto.PersonDto;
 import com.rest_api.spring_boot_rest_api.integrationtests.testecontainers.AbstractIntegrationTest;
+import com.rest_api.spring_boot_rest_api.wrapper.xml.PagedModelPerson;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -15,6 +16,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 
 import java.util.List;
@@ -203,7 +205,8 @@ class PersonControllerWithXmlTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        List<PersonDto> people = xmlMapper.readValue(content, new TypeReference<List<PersonDto>>() {});
+        PagedModelPerson wrapper = xmlMapper.readValue(content, PagedModelPerson.class);
+        List<PersonDto> people = wrapper.getContent();
 
         PersonDto personOne = people.get(0);
 
