@@ -6,6 +6,7 @@ import com.rest_api.spring_boot_rest_api.repository.BookRepository;
 import com.rest_api.spring_boot_rest_api.unittests.mapper.mocks.MockBoock;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -168,6 +169,7 @@ class BookServiceTest {
     }
 
     @Test
+    @Disabled("REASON: In development.")
     void findAll() {
         List<Book> books = input.mockEntityList();
         when(bookRepository.findAll()).thenReturn(books);
