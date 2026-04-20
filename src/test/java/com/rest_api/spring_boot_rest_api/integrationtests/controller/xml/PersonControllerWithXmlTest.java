@@ -221,6 +221,40 @@ class PersonControllerWithXmlTest extends AbstractIntegrationTest {
 
     @Order(6)
     @Test
+    void findByName() throws JsonProcessingException {
+
+        var content = given(requestSpecification)
+                .accept(MediaType.APPLICATION_XML_VALUE)
+                .basePath("/api/person/v1/findByName/{firstName}")
+                .pathParam("firstName", "te")
+                .queryParam("size", 12)
+                .queryParam("page", 0)
+                .queryParam("direction", "asc")
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
+                .extract()
+                .body()
+                .asString();
+
+        PagedModelPerson wrapper = xmlMapper.readValue(content, PagedModelPerson.class);
+        List<PersonDto> people = wrapper.getContent();
+
+        PersonDto personOne = people.get(0);
+
+        assertNotNull(personOne.getId());
+        assertTrue(personOne.getId() > 0);
+
+        assertEquals("Test Man", personOne.getFirstName());
+        assertEquals("repoleved", personOne.getLastName());
+        assertEquals("Linux", personOne.getAdress());
+        assertEquals("Male", personOne.getGender());
+    }
+
+    @Order(7)
+    @Test
     void delete(){
         given(requestSpecification)
                 .pathParam("id", person.getId()) // parameter name in controller /{id}
