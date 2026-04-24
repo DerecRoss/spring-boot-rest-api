@@ -1,5 +1,7 @@
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,http://github.com/DerecRoss
+file:
+  upload-dir: /Documentos/code/uploadDir/
 spring:
   application:
     name: spring-boot-rest-api
@@ -19,14 +21,20 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    open-in-view: false
     properties:
+      format_sql: true
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
+    open-in-view: false
+  servlet:
+    multipart:
+      enable: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 logging:
   level:
-#    root: WARN
+    #    root: WARN
     org.flywaydb: DEBUG
     com.rest_api: DEBUG
 

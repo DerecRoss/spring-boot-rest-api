@@ -1,8 +1,6 @@
 package com.rest_api.spring_boot_rest_api.exception.handler;
 
-import com.rest_api.spring_boot_rest_api.exception.ExceptionResponse;
-import com.rest_api.spring_boot_rest_api.exception.RequiredObjectIsNonNullException;
-import com.rest_api.spring_boot_rest_api.exception.ResourceNotFoundException;
+import com.rest_api.spring_boot_rest_api.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,6 +32,20 @@ public class CustomizeEntityResponseHandler extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(Exception.class) // support for all exceptions for Exception.class
     public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception e, WebRequest webRequest){
+        ExceptionResponse response = new ExceptionResponse(new Date(), e.getMessage(),
+                webRequest.getDescription(true));
+        return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class) // support for all exceptions for Exception.class
+    public final ResponseEntity<ExceptionResponse> FileNotFoundException(Exception e, WebRequest webRequest){
+        ExceptionResponse response = new ExceptionResponse(new Date(), e.getMessage(),
+                webRequest.getDescription(true));
+        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FileStorageException.class) // support for all exceptions for Exception.class
+    public final ResponseEntity<ExceptionResponse> FileStorageException(Exception e, WebRequest webRequest){
         ExceptionResponse response = new ExceptionResponse(new Date(), e.getMessage(),
                 webRequest.getDescription(true));
         return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);

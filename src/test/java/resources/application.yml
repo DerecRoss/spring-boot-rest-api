@@ -18,11 +18,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+    open-in-view: false
+  servlet:
+    multipart:
+      enable: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 
 logging:
   level:
