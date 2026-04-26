@@ -1,7 +1,7 @@
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,http://github.com/DerecRoss
 file:
-  upload-dir: /Documentos/code/uploadDir/
+  upload-dir: /home/derec/Documentos/uploadDir
 spring:
   application:
     name: spring-boot-rest-api
@@ -28,7 +28,7 @@ spring:
     open-in-view: false
   servlet:
     multipart:
-      enable: true
+      enabled: true
       file-size-threshold: 2KB
       max-file-size: 200MB
       max-request-size: 215MB
