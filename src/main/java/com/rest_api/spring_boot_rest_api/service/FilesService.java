@@ -2,10 +2,13 @@ package com.rest_api.spring_boot_rest_api.service;
 
 import com.rest_api.spring_boot_rest_api.config.FileStorageConfig;
 import com.rest_api.spring_boot_rest_api.controller.FileController;
+import com.rest_api.spring_boot_rest_api.exception.FileNotFoundException;
 import com.rest_api.spring_boot_rest_api.exception.FileStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +62,23 @@ public class FilesService {
         } catch (Exception e){
             logger.error("Could not store file {} try again.", fileName);
             throw new FileStorageException("Could not store file " + fileName + " try again.", e.getCause());
+        }
+    }
+
+    public Resource loadFileAsResource(String fileName){
+        try{
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize(); // catch path in disk
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) { 
+                return resource;
+            }else {
+                throw new FileNotFoundException("File not found.");
+            }
+
+        }catch (Exception e){
+            logger.error("File not found in database");
+            throw new FileNotFoundException("File not found.", e.getCause());
         }
     }
 }
