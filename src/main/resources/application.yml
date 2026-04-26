@@ -1,7 +1,7 @@
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,http://github.com/DerecRoss
 file:
-  upload-dir: /home/derec/Documentos/uploadDir
+  upload-dir: uploadDir
 spring:
   application:
     name: spring-boot-rest-api
