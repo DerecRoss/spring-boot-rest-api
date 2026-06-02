@@ -9,6 +9,7 @@ import com.rest_api.spring_boot_rest_api.model.Person;
 import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -124,24 +125,7 @@ public class PersonService {
 
         var people = repository.findAll(pageable);
 
-        var peopleWithLinks = people.map(person -> {
-            var dto = parseObject(person, PersonDto.class);
-            try {
-                addHateOsLinks(dto);
-            } catch (BadRequestException e) {
-                throw new RuntimeException(e);
-            }
-            return dto;
-        });
-
-        Link findAllLink = WebMvcLinkBuilder.linkTo(
-                        WebMvcLinkBuilder.methodOn(PersonController.class)
-                                .findAll(
-                                        pageable.getPageNumber(),
-                                        pageable.getPageSize(),
-                                        String.valueOf(pageable.getSort())))
-                .withSelfRel();
-        return assembler.toModel(peopleWithLinks, findAllLink);
+        return buildPagedModel(pageable, people);
     }
 
     public PagedModel<EntityModel<PersonDto>> findPeopleByName(String firstName, Pageable pageable){
@@ -150,6 +134,27 @@ public class PersonService {
 
         var people = repository.findPeopleByName(firstName, pageable);
 
+        return buildPagedModel(pageable, people);
+    }
+
+    private void addHateOsLinks(PersonDto dto) throws BadRequestException {
+        dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
+
+        dto.add(linkTo(methodOn(PersonController.class).findAll(0, 12, "asc")).withRel("find-all").withType("GET"));
+
+        dto.add(linkTo(methodOn(PersonController.class).findPeopleByName("", 12, 12, "asc")).withRel("find-by-name").withType("GET"));
+
+        dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
+
+        dto.add(linkTo(methodOn(PersonController.class).save(dto)).withRel("create").withType("POST"));
+
+        dto.add(linkTo(methodOn(PersonController.class).put(dto)).withRel("update").withType("PUT"));
+
+        dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
+    }
+
+    private @NonNull PagedModel<EntityModel<PersonDto>> buildPagedModel(Pageable pageable, Page<Person> people) {
+
         var peopleWithLinks = people.map(person -> {
             var dto = parseObject(person, PersonDto.class);
             try {
@@ -168,19 +173,5 @@ public class PersonService {
                                         String.valueOf(pageable.getSort())))
                 .withSelfRel();
         return assembler.toModel(peopleWithLinks, findAllLink);
-    }
-
-    private void addHateOsLinks(PersonDto dto) throws BadRequestException {
-        dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
-
-        dto.add(linkTo(methodOn(PersonController.class).findAll(0, 12, "asc")).withRel("find-all").withType("GET"));
-
-        dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
-
-        dto.add(linkTo(methodOn(PersonController.class).save(dto)).withRel("create").withType("POST"));
-
-        dto.add(linkTo(methodOn(PersonController.class).put(dto)).withRel("update").withType("PUT"));
-
-        dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
     }
 }
