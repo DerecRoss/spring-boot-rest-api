@@ -13,6 +13,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -52,6 +53,18 @@ public interface PersonControllerDocs {
                     @Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = PersonDto.class))
                     )
+            }),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+    })
+    List<PersonDto> massCreation(MultipartFile file) throws Exception;
+
+    @Operation(summary = "Massive creation of people", description = "Create massive people", tags = {"People"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = PersonDto.class))
             }),
             @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),

@@ -3,7 +3,10 @@ package com.rest_api.spring_boot_rest_api.service;
 import com.rest_api.spring_boot_rest_api.controller.PersonController;
 import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
+import com.rest_api.spring_boot_rest_api.exception.FileStorageException;
 import com.rest_api.spring_boot_rest_api.exception.RequiredObjectIsNonNullException;
+import com.rest_api.spring_boot_rest_api.file.importer.contract.FileImporter;
+import com.rest_api.spring_boot_rest_api.file.importer.factory.FileImporterFactory;
 import com.rest_api.spring_boot_rest_api.mapper.custom.PersonMapper;
 import com.rest_api.spring_boot_rest_api.model.Person;
 import com.rest_api.spring_boot_rest_api.repository.PersonRepository;
@@ -14,14 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static com.rest_api.spring_boot_rest_api.mapper.ObjectMapper.parseObject;
@@ -38,6 +45,9 @@ public class PersonService {
 
     @Autowired
     PersonMapper personMapper;
+
+    @Autowired
+    FileImporterFactory importer;
 
     @Autowired
     PagedResourcesAssembler<PersonDto> assembler;
@@ -126,6 +136,35 @@ public class PersonService {
         var people = repository.findAll(pageable);
 
         return buildPagedModel(pageable, people);
+    }
+
+    public List<PersonDto> massCreation(MultipartFile file) throws BadRequestException {
+        logger.info("Importing people from .xlsx.");
+
+        if (file.isEmpty()) throw new BadRequestException("Invalid resource.");
+
+        try(InputStream inputStream = file.getInputStream()){
+            String fileName = Optional.ofNullable(file.getOriginalFilename()) // get name for factory
+                    .orElseThrow(() -> new BadRequestException("Invalid file name"));
+            FileImporter importer = this.importer.getImporter(fileName); // create xlsx or .csv importer
+
+            List<Person> entities = importer.importFile(inputStream).stream()
+                    .map(dto -> repository.save(parseObject(dto, Person.class)))
+                    .toList(); // return dto list to person.class
+
+            return entities.stream()
+                    .map(entity -> {
+                        var dto = parseObject(entity, PersonDto.class);
+                        try {
+                            addHateOsLinks(dto);
+                        } catch (BadRequestException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return dto;
+                    }).toList();
+        }catch (Exception e){
+            throw new FileStorageException("File can't be saved.");
+        }
     }
 
     public PagedModel<EntityModel<PersonDto>> findPeopleByName(String firstName, Pageable pageable){

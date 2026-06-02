@@ -34,9 +34,9 @@ public class CsvImporter implements FileImporter {
         for (CSVRecord record : records){
             PersonDto person = new PersonDto();
             person.setFirstName(record.get("first_name"));
-            person.setFirstName(record.get("last_name"));
-            person.setFirstName(record.get("adress"));
-            person.setFirstName(record.get("gender"));
+            person.setLastName(record.get("last_name"));
+            person.setAdress(record.get("adress"));
+            person.setGender(record.get("gender"));
             person.setEnabled(true);
             people.add(person);
         }

@@ -17,6 +17,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/person/v1")
@@ -33,6 +36,12 @@ public class PersonController implements PersonControllerDocs {
     public ResponseEntity<PersonDto> findById(@PathVariable Long id) throws BadRequestException {
         PersonDto person = personService.findById(id);
         return new ResponseEntity<>(person, HttpStatus.OK);
+    }
+
+    @PostMapping("/files/massCreation")
+    @Override
+    public List<PersonDto> massCreation(@RequestParam("file") MultipartFile file) throws Exception {
+        return personService.massCreation(file);
     }
 
     @GetMapping("/find-all")
