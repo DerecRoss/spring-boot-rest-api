@@ -206,7 +206,7 @@ public class PersonService {
 
         dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
 
-        dto.add(linkTo(methodOn(PersonController.class).exportPeoplePage(1, 12, "asc", MediaTypes.APPLICATION_CSV_VALUE)).withRel("exportPage").withType("GET"));
+        dto.add(linkTo(methodOn(PersonController.class).exportPeoplePage(1, 12, "asc", null )).withRel("exportPage").withType("GET").withTitle("Export People"));
 
         dto.add(linkTo(methodOn(PersonController.class).save(dto)).withRel("create").withType("POST"));
 

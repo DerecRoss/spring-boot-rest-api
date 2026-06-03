@@ -3,10 +3,13 @@ package com.rest_api.spring_boot_rest_api.controller;
 import com.rest_api.spring_boot_rest_api.controller.docs.PersonControllerDocs;
 import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.dto.v2.PersonDtoV2;
+import com.rest_api.spring_boot_rest_api.file.exporter.MediaTypes;
 import com.rest_api.spring_boot_rest_api.service.PersonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +41,28 @@ public class PersonController implements PersonControllerDocs {
     public ResponseEntity<PersonDto> findById(@PathVariable Long id) throws BadRequestException {
         PersonDto person = personService.findById(id);
         return new ResponseEntity<>(person, HttpStatus.OK);
+    }
+
+    @GetMapping("/files/exportPeople")
+    @Override
+    public ResponseEntity<Resource> exportPeoplePage(Integer page, Integer size, String direction, HttpServletRequest request) {
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName"));
+
+        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+
+        Resource file = personService.exportPeoplePage(pageable, acceptHeader);
+
+        var contentType = acceptHeader != null ? acceptHeader : "application/octet-stream";
+        var fileExtension = MediaTypes.APPLICATION_XLSX_VALUE.equalsIgnoreCase(acceptHeader) ? ".xlsx" : ".csv";
+        var fileName = "people_exported" + fileExtension;
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, // attach in header of response.
+                        "attachment; filename=\""
+                                + fileName + "\"")
+                .body(file);
     }
 
     @PostMapping("/files/massCreation")
