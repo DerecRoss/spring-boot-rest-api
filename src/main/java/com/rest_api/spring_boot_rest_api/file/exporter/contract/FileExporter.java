@@ -6,5 +6,5 @@ import org.springframework.core.io.Resource;
 import java.util.List;
 
 public interface FileExporter {
-    Resource importFile(List<PersonDto> people) throws Exception;
+    Resource exportFile(List<PersonDto> people) throws Exception;
 }
