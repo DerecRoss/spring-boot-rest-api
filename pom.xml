@@ -18,6 +18,7 @@
         <dozer.version>7.0.0</dozer.version>
         <commons.csv.version>1.12.0</commons.csv.version>
         <apache.poi.version>5.4.0</apache.poi.version>
+        <java.jwt.version>4.4.0</java.jwt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -39,6 +40,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java.jwt.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
