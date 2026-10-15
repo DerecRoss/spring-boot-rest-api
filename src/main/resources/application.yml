@@ -2,6 +2,11 @@ cors:
   originPatterns: http://localhost:8080,http://localhost:3000,http://github.com/DerecRoss
 file:
   upload-dir: uploadDir
+security:
+  jwt:
+    token:
+      secret-key: 53cr37
+      expire-length: 3600000
 spring:
   application:
     name: spring-boot-rest-api
