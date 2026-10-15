@@ -7,7 +7,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.rest_api.spring_boot_rest_api.dto.security.TokenDto;
 import com.rest_api.spring_boot_rest_api.exception.InvalidJwtAuthenticationException;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class JwtTokenProvider {
     private String secretKey;
 
     @Value("${security.jwt.token.expire-length:3600000}")
-    private String validityInMilliSeconds;
+    private Long validityInMilliSeconds;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -52,14 +51,13 @@ public class JwtTokenProvider {
     }
 
     private String getRefreshToken(String userName, List<String> roles, Date now) {
-        Date refreshTokenValidity = new Date(now.getTime() + validityInMilliSeconds);
+        Date refreshTokenValidity = new Date(now.getTime() + (validityInMilliSeconds * 3));
         return JWT.create()
                 .withClaim("roles", roles)
                 .withIssuedAt(now)
                 .withExpiresAt(refreshTokenValidity)
                 .withSubject(userName)
-                .sign(algorithm)
-                .toString();
+                .sign(algorithm);
     }
 
     private String getAcessToken(String userName, List<String> roles, Date now, Date validity) {
@@ -70,8 +68,7 @@ public class JwtTokenProvider {
                 .withExpiresAt(validity)
                 .withSubject(userName)
                 .withIssuer(issueUrl)
-                .sign(algorithm)
-                .toString();
+                .sign(algorithm);
     }
 
     public Authentication getAuthentication(String token){
@@ -87,7 +84,7 @@ public class JwtTokenProvider {
         return decodedJWT;
     }
 
-    public String resolveToke(HttpServletRequest request){
+    public String resolveToken(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization"); // default header for security systems.
         // Bearer | TOKEN
 
