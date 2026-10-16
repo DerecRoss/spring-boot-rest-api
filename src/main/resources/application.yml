@@ -44,7 +44,9 @@ logging:
     com.rest_api: DEBUG
 
 springdoc:
-  paths-to-match: /api/**/v1/**
+  paths-to-match:
+    - /api/**/v1/**
+    - /auth/**
   swagger-ui:
     user-root-path: true
 
