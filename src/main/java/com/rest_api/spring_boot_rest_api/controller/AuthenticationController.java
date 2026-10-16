@@ -2,6 +2,7 @@ package com.rest_api.spring_boot_rest_api.controller;
 
 import com.rest_api.spring_boot_rest_api.dto.security.AccountCredentialsSignupDto;
 import com.rest_api.spring_boot_rest_api.dto.security.TokenDto;
+import com.rest_api.spring_boot_rest_api.dto.v1.PersonDto;
 import com.rest_api.spring_boot_rest_api.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,5 +55,11 @@ public class AuthenticationController {
 
     private boolean parameterAreInvalid(String username, String refreshToken) {
         return StringUtils.isBlank(username) || StringUtils.isBlank(refreshToken);
+    }
+
+    @PostMapping("/auth/createUser")
+    public ResponseEntity<AccountCredentialsSignupDto> save(@RequestBody AccountCredentialsSignupDto user) {
+        AccountCredentialsSignupDto entity = authService.save(user);
+        return new ResponseEntity<>(entity, HttpStatus.CREATED);
     }
 }

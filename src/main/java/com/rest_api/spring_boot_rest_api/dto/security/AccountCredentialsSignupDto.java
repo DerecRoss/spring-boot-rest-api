@@ -9,20 +9,34 @@ public class AccountCredentialsSignupDto implements Serializable {
 
     private String userName;
     private String password;
+    private String fullName;
 
-    public AccountCredentialsSignupDto() {
+    public AccountCredentialsSignupDto() {}
+
+    public AccountCredentialsSignupDto(String userName, String password, String fullName) {
+        this.userName = userName;
+        this.password = password;
+        this.fullName = fullName;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         AccountCredentialsSignupDto that = (AccountCredentialsSignupDto) o;
-        return Objects.equals(userName, that.userName) && Objects.equals(password, that.password);
+        return Objects.equals(userName, that.userName) && Objects.equals(password, that.password) && Objects.equals(fullName, that.fullName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, password);
+        return Objects.hash(userName, password, fullName);
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getUserName() {
