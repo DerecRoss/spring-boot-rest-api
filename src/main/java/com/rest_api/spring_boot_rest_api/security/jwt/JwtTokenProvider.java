@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.rest_api.spring_boot_rest_api.dto.security.TokenDto;
 import com.rest_api.spring_boot_rest_api.exception.InvalidJwtAuthenticationException;
+import com.rest_api.spring_boot_rest_api.service.UserDetailsService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -88,11 +88,10 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader("Authorization"); // default header for security systems.
         // Bearer | TOKEN
 
-        if (StringUtils.isEmpty(bearerToken ) && bearerToken.startsWith("Bearer")) {
+        if (StringUtils.isNotBlank(bearerToken ) && bearerToken.startsWith("Bearer")) {
             return bearerToken.substring("Bearer ".length());
-        }else {
-            throw new InvalidJwtAuthenticationException("Invalid Token Provider");
         }
+        return null;
     }
 
     public boolean validateToken(String token){
